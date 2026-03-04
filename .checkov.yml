@@ -1,0 +1,48 @@
+# cloud-policies-check/.checkov.yml
+# Unified version - rigor is controlled by the CHECKOV_LEVEL env var
+# Possible values: sandbox | non-prd | prd
+#
+# The pipeline injects CHECKOV_LEVEL before calling the wrapper script
+# (scripts/run-checkov.sh), which translates the level into additional flags.
+
+framework:
+  - terraform
+
+soft-fail-on:
+  - HIGH
+  - MEDIUM
+  - LOW
+  - CKV2_AWS_62   # S3 event notifications — not mandatory in v1
+  - CKV2_AWS_61   # S3 lifecycle — not mandatory in v1
+
+# ─── Category A: CRITICAL Rules (never skippable) ───
+# These rules ALWAYS cause hard-fail in ALL environments.
+# They correspond to Category A in the categorization spreadsheet.
+hard-fail-on:
+  - CKV_AWS_41    # Hardcoded credentials in providers
+  - CKV_AWS_145   # RDS without encryption at rest
+  #- CKV_AWS_19    # S3 without server-side encryption
+  #- CKV_AWS_18    # S3 bucket with logging disabled
+  - CKV_AWS_46    # EC2 IMDSv2 not enabled
+  #- CKV_AWS_144   # S3 cross-region replication
+  - CKV_AWS_23    # Security group with permissive rule (0.0.0.0/0)
+  # ... add CRITICAL rules as per categorization in spreadsheet
+
+# ─── Base configuration (applies to all environments) ───
+check:
+  - CKV_AWS_*     # All AWS checks
+  - CKV2_AWS_*    # Composite AWS checks
+
+skip-check:
+  # Rules disabled globally (document reason):
+  # - CKV_AWS_999   # Example: rule not applicable to organization
+
+# ─── External checks ───
+external-checks-dir:
+  - checks/terraform/
+
+compact: true
+output:
+  - cli
+  - junitxml
+  - sarif

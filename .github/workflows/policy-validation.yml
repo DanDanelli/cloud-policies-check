@@ -1,0 +1,44 @@
+name: Policy Validation
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-policies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install checkov pytest
+
+      - name: Validate custom checks syntax
+        run: |
+          python -m py_compile checks/terraform/enforce_tags.py
+          python -m py_compile checks/terraform/deny_public_s3.py
+
+      - name: Run unit tests
+        run: |
+          cd tests && python -m pytest -v .
+
+      - name: Verify checks register correctly
+        run: |
+          checkov --list --external-checks-dir checks/terraform/ \
+            | grep -E "CKV_CUSTOM_" || {
+              echo "ERROR: Custom checks not registering"
+              exit 1
+            }
+
+      - name: Validate .checkov.yml syntax
+        run: |
+          python -c "import yaml; yaml.safe_load(open('.checkov.yml'))"

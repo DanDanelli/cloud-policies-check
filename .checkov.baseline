@@ -1,0 +1,5 @@
+{
+  "description": "Baseline de violações aceitas para adoção incremental.",
+  "note": "Violações listadas aqui são ignoradas pelo Checkov até serem resolvidas gradualmente.",
+  "failed_checks": []
+}
