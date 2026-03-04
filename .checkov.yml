@@ -12,8 +12,6 @@ soft-fail-on:
   - HIGH
   - MEDIUM
   - LOW
-  - CKV2_AWS_62   # S3 event notifications — not mandatory in v1
-  - CKV2_AWS_61   # S3 lifecycle — not mandatory in v1
 
 # ─── Category A: CRITICAL Rules (never skippable) ───
 # These rules ALWAYS cause hard-fail in ALL environments.
@@ -24,7 +22,6 @@ hard-fail-on:
   #- CKV_AWS_19    # S3 without server-side encryption
   #- CKV_AWS_18    # S3 bucket with logging disabled
   - CKV_AWS_46    # EC2 IMDSv2 not enabled
-  #- CKV_AWS_144   # S3 cross-region replication
   - CKV_AWS_23    # Security group with permissive rule (0.0.0.0/0)
   # ... add CRITICAL rules as per categorization in spreadsheet
 
@@ -35,7 +32,9 @@ check:
 
 skip-check:
   # Rules disabled globally (document reason):
-  # - CKV_AWS_999   # Example: rule not applicable to organization
+  - CKV2_AWS_62   # S3 event notifications — not required in POC (no Prisma Cloud API for severity metadata)
+  - CKV2_AWS_61   # S3 lifecycle configuration — not required in POC
+  - CKV_AWS_144   # S3 cross-region replication — not required in POC
 
 # ─── External checks ───
 external-checks-dir:
